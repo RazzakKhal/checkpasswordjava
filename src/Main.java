@@ -59,7 +59,7 @@ TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futur
         // de buffer à string hexadecimal
         // trouvée ici https://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java
        var bufferSalt = HexFormat.of().parseHex(salt);
-
+        int endOfLoop = 1;
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
 
@@ -89,29 +89,54 @@ TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futur
 
                                     HttpClient client2 = HttpClient.newHttpClient();
                                     String url = "https://shallenge.onrender.com/challenges/" + hashObject.getId() + "/answer";
+
                                     HttpRequest request2 = HttpRequest.newBuilder()
                                             .uri(new URI(url))
-                                            .version(HttpClient.Version.HTTP_2)
+                                            .version(HttpClient.Version.HTTP_1_1)
                                             .header("Content-Type", "application/json")
-                                            .POST(HttpRequest.BodyPublishers.ofString(password))
+                                            .POST(HttpRequest.BodyPublishers.ofString( "\"" + password + "\""))
                                             .build();
 
                                     System.out.println(request2.headers());
                                     HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
-                                    System.out.println(response2.headers());
+                                    System.out.println(response2);
                                     System.out.println(response2.body());
-
+                                    endOfLoop = 2;
 
                                 ;
                                 break;
                             }
+                        // fin Boucle 2
+                        if(endOfLoop == 2){
+                            break;
+                        }
 
 
                         }
+                            // fin Boucle 3
+                            if(endOfLoop == 2){
+                                break;
+                            }
+
+                        }
+                        // fin Boucle 4
+                        if(endOfLoop == 2){
+                            break;
+                        }
+
                     }
+                    // fin Boucle 5
+                    if(endOfLoop == 2){
+                        break;
+                    }
+
                 }
+                // fin Boucle 6
+                if(endOfLoop == 2){
+                    break;
+                }
+
             }
-        }
     }
 
 
