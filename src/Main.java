@@ -86,6 +86,8 @@ TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futur
 
                                 if(bytesToHex(hash).equals(theHash)){
                                     System.out.println(password);
+
+                                    HttpClient client2 = HttpClient.newHttpClient();
                                     String url = "https://shallenge.onrender.com/challenges/" + hashObject.getId() + "/answer";
                                     HttpRequest request2 = HttpRequest.newBuilder()
                                             .uri(new URI(url))
@@ -94,8 +96,9 @@ TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futur
                                             .POST(HttpRequest.BodyPublishers.ofString(password))
                                             .build();
 
-
-                                    HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+                                    System.out.println(request2.headers());
+                                    HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
+                                    System.out.println(response2.headers());
                                     System.out.println(response2.body());
 
 
