@@ -1,7 +1,14 @@
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+
 
 public class Main {
 
@@ -17,12 +24,36 @@ public class Main {
         }
         return hexString.toString();
     }
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        // pour trouver le mot de passe
-// utiliser 6 lettres abcdef... , les Buffer, concatener avec salt buffer les hasher, comparer au hash
+    public static void main(String[] args) throws NoSuchAlgorithmException, URISyntaxException, IOException, InterruptedException {
 
-        String salt = "02b2c31c64dc40cd863c423ff3478e70";
-        String theHash = "cbafb5166696c0e50bb8d0b01bb1773e2528c4796ea3e5a388e40bf44c806069";
+
+// mise en place de l'equivalent de mon fetch de manière synchrone --> https://www.baeldung.com/java-9-http-client
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("https://shallenge.onrender.com/challenges"))
+                .version(HttpClient.Version.HTTP_2)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // transformer la reponse en objet pour pouvoir lire les propriétés
+
+        ;
+String futurObject = response.body();
+        System.out.println(futurObject);
+TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futurObject.substring(127,159) , futurObject.substring(7,43));
+
+        System.out.println(hashObject.getHash());
+        System.out.println(hashObject.getId());
+        System.out.println(hashObject.getSalt());
+        String theHash = hashObject.getHash();
+        String salt = hashObject.getSalt();
+
 
 
         // de buffer à string hexadecimal
@@ -52,13 +83,20 @@ public class Main {
 
                                 byte[] hash = digest.digest(mergeBuffer);
 
-                                if(password.equals("rrrrrr")){
-                                    System.out.println("yep");
-                                }
 
                                 if(bytesToHex(hash).equals(theHash)){
                                     System.out.println(password);
+                                    String url = "https://shallenge.onrender.com/challenges/" + hashObject.getId() + "/answer";
+                                    HttpRequest request2 = HttpRequest.newBuilder()
+                                            .uri(new URI(url))
+                                            .version(HttpClient.Version.HTTP_2)
+                                            .header("Content-Type", "application/json")
+                                            .POST(HttpRequest.BodyPublishers.ofString(password))
+                                            .build();
 
+
+                                    HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+                                    System.out.println(response2.body());
 
 
                                 ;
