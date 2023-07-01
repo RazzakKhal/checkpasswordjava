@@ -51,94 +51,23 @@ TheHashObject hashObject = new TheHashObject(futurObject.substring(53,117),futur
         System.out.println(hashObject.getHash());
         System.out.println(hashObject.getId());
         System.out.println(hashObject.getSalt());
+
+
+
         String theHash = hashObject.getHash();
         String salt = hashObject.getSalt();
 
+        Kata thread1 = new Kata(salt, theHash, hashObject, 0, 8);
+        thread1.start();
 
+        Kata thread2 = new Kata(salt, theHash, hashObject, 8, 16);
+        thread2.start();
 
-        // de buffer à string hexadecimal
-        // trouvée ici https://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java
-       var bufferSalt = HexFormat.of().parseHex(salt);
-        int endOfLoop = 1;
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        Kata thread3 = new Kata(salt, theHash, hashObject, 16, 24);
+        thread3.start();
 
-
-//boucle avec 6 carac --> Buffer --> concat avec le salt --> hash --> compare
-        String alphabete = "abdcefghijklmnopqrstuvwxyz";
-        String[] alphabet = alphabete.split("");
-        for(int a=0; a < 26; a++){
-            for(int b=0; b < 26; b++){
-                for(int c=0; c < 26; c++){
-                    for(int d=0; d < 26; d++){
-                        for(int e=0; e < 26; e++){
-                            for(int f=0; f < 26; f++){
-
-                                String password = alphabet[a] + alphabet[b] + alphabet[c] + alphabet[d] + alphabet[e] + alphabet[f];
-
-                                // si le hash du buffer du password + du buffer du salt equals the hash alors on affiche le pass
-                                var bufferPass = password.getBytes();
-                                byte[] mergeBuffer = new byte[bufferPass.length + bufferSalt.length];
-                                System.arraycopy(bufferSalt, 0, mergeBuffer, 0, bufferSalt.length);
-                                System.arraycopy(bufferPass, 0, mergeBuffer, bufferSalt.length, bufferPass.length);
-
-                                byte[] hash = digest.digest(mergeBuffer);
-
-
-                                if(bytesToHex(hash).equals(theHash)){
-                                    System.out.println(password);
-
-                                    HttpClient client2 = HttpClient.newHttpClient();
-                                    String url = "https://shallenge.onrender.com/challenges/" + hashObject.getId() + "/answer";
-
-                                    HttpRequest request2 = HttpRequest.newBuilder()
-                                            .uri(new URI(url))
-                                            .version(HttpClient.Version.HTTP_1_1)
-                                            .header("Content-Type", "application/json")
-                                            .POST(HttpRequest.BodyPublishers.ofString( "\"" + password + "\""))
-                                            .build();
-
-                                    System.out.println(request2.headers());
-                                    HttpResponse<String> response2 = client2.send(request2, HttpResponse.BodyHandlers.ofString());
-                                    System.out.println(response2);
-                                    System.out.println(response2.body());
-                                    endOfLoop = 2;
-
-                                ;
-                                break;
-                            }
-                        // fin Boucle 2
-                        if(endOfLoop == 2){
-                            break;
-                        }
-
-
-                        }
-                            // fin Boucle 3
-                            if(endOfLoop == 2){
-                                break;
-                            }
-
-                        }
-                        // fin Boucle 4
-                        if(endOfLoop == 2){
-                            break;
-                        }
-
-                    }
-                    // fin Boucle 5
-                    if(endOfLoop == 2){
-                        break;
-                    }
-
-                }
-                // fin Boucle 6
-                if(endOfLoop == 2){
-                    break;
-                }
-
-            }
-    }
-
+        Kata thread4 = new Kata(salt, theHash, hashObject, 24, 26);
+        thread4.start();
 
         }
 }
